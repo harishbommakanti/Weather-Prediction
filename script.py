@@ -6,16 +6,7 @@ import matplotlib.pyplot as plt #for potential graphing
 import requests                 #for openweather API calls at the least
 
 #ML stuff
-from sklearn import svm
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LinearRegression
-from sklearn import linear_model
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
-from sklearn.metrics import r2_score
-from sklearn.metrics import mean_absolute_error
-from sklearn.metrics import confusion_matrix
+import statsmodels.api as sm
 #--------------------------------------------------------------
 
 #here the connection will be established to the DB
@@ -43,5 +34,19 @@ print(data.index)
 
 #we don't need to resample as we know the data in the DB will be every 3 hrs
 y = data['temp']
+
+#--------------------------------------------------------------
+
+#some visualization
+y.plot()
+plt.show()
+
+#showing trend, seasonality, noise
+from pylab import rcParams
+rcParams['figure.figsize'] = 18,8
+
+decomposition = sm.tsa.seasonal_decompose(y, model='additive')
+fig = decomposition.plot()
+plt.show()
 
 #--------------------------------------------------------------
