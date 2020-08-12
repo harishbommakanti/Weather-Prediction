@@ -1,14 +1,19 @@
-function main()
+async function main()
 {
+    //get past 5 times at intervals currTime-24hr, currTime-28hr etc.
     let pastTimes = getPastTimes();
+
+
+    //user zipcode -> lat-long
+    let zipcodeInput = "78613";//document.getElementById("zipcode").value().trim().substring(0,5);
+    let latLongArr = await getLatLong(zipcodeInput);
+    //console.log(latLongArr);
+
+
 
     //do openweather API calls to load the past 5 days of data in 3 hr increments into a JSON
     //format:  https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lon}&dt={time}&appid={YOUR API KEY} 
-    
-    let weatherApiKey = 'ef49a66f02393c65eb96e511aa8a7898' //harish's api key
-    
-    //need to convert zipcode to lat-long
-
+    let weatherApiKey = 'ef49a66f02393c65eb96e511aa8a7898'; //harish's api key
 
 
 
@@ -21,7 +26,7 @@ function main()
 }
 
 //returns an array of UNIX times for the past 5 days
-function pastTimes()
+function getPastTimes()
 {
     //get current UNIX time
     let currTime = Math.round((new Date()).getTime() / 1000)
@@ -45,20 +50,43 @@ async function getAPIResponse(url)
         })
 }
 
+//returns an array (really a promise) of [lat, long]
 async function getLatLong(zip)
 {
     //format: https://www.zipcodeapi.com/rest/<api_key>/info.<format>/<zip_code>/<units>
     
-    let zipcode = zip//document.getElementById("zipcode").value().trim().substring(0,5);
-    if (!(zipcode.length == 5 && /^[0-9]+$/.test(zipcode)))
+    if (!(zip.length == 5 && /^[0-9]+$/.test(zip)))
     {
         alert("Zipcode is not formatted correctly. Make sure it only has 5 digits and matches US Zipcode format.")
     }
 
     let applicationApiKey = 'hKzocZfFBzwpJU0NImyynukV7g7RnN3aH8tX2WWc6woz2VJy8ecyYJCr1aQtb0FJ'
-    let jsClientKey = 'js-eV2aEpVYlSwidSXUswp6Hvo94QGoBervP9GDDJAG3xowo6hLvrfLzecizuvcsUxs'
+    //let jsClientKey = 'js-eV2aEpVYlSwidSXUswp6Hvo94QGoBervP9GDDJAG3xowo6hLvrfLzecizuvcsUxs'
 
-    let url = `https://www.zipcodeapi.com/rest/${jsClientKey}/info.json/${zipcode}/degrees`
+    let url = `https://www.zipcodeapi.com/rest/${applicationApiKey}/info.json/${zip}/degrees`
 
-    //need to use `fetch` to get the API response now
+    
+    const response = await fetch(url);
+    const json = await response.json();
+
+    const arr = [json["lat"], json["lng"]];
+    return arr;
+
+    /*
+    return fetch(url)
+        .then(res => res.json())
+        .then((response) => {
+            let return_arr = [response['lat'], response['lng']]
+            return return_arr
+        })
+        .catch(err => { throw err });
+    */
 }
+
+const fetch = require('node-fetch')
+main()
+
+/*
+maybe needed code for handling async methods onClick
+element.addEventListener('click', async (e) => {put code here});
+*/
