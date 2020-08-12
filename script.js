@@ -30,7 +30,9 @@ async function main()
     //console.log(allTemperatures.length) //length is 120, thats good because 24 hrs * 5 days
 
 
-    //load the data into a local CSV file
+
+    //load the data into a LocalStorage object to use later in python
+    localStorage.setItem("temps",allTemperatures);
 }
 
 //returns an array of UNIX times for the past 5 days
@@ -104,8 +106,10 @@ async function performOpenWeatherAPICall(url)
     return temperatures;
 }
 
-const fetch = require('node-fetch')
-main()
+const fetch = require('node-fetch');
+
+//only for testing purposes
+//main()
 
 /*
 maybe needed code for handling async methods onClick
