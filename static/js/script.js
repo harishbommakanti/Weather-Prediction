@@ -1,3 +1,5 @@
+//const fetch = require('node-fetch');
+
 async function main()
 {
     //get past 5 times at intervals currTime-24hr, currTime-28hr etc.
@@ -105,8 +107,6 @@ async function performOpenWeatherAPICall(url)
 
     return temperatures;
 }
-
-const fetch = require('node-fetch');
 
 //only for testing purposes
 //main()
