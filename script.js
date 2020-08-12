@@ -7,6 +7,8 @@ async function main()
     //user zipcode -> lat-long
     let zipcodeInput = "78613";//document.getElementById("zipcode").value().trim().substring(0,5);
     let latLongArr = await getLatLong(zipcodeInput);
+    let lat = latLongArr[0];
+    let long = latLongArr[1];
     //console.log(latLongArr);
 
 
@@ -15,14 +17,20 @@ async function main()
     //format:  https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lon}&dt={time}&appid={YOUR API KEY} 
     let weatherApiKey = 'ef49a66f02393c65eb96e511aa8a7898'; //harish's api key
 
+    let allTemperatures = [];
+    for (let i = 0; i < pastTimes.length; i++)
+    {
+        let time = pastTimes[i];
+        let url = `https://api.openweathermap.org/data/2.5/onecall/timemachine?lat=${lat}&lon=${long}&dt=${time}&appid=${weatherApiKey}`;
+
+        let tempsFromThatDay = await performOpenWeatherAPICall(url);
+        allTemperatures = allTemperatures.concat(tempsFromThatDay);
+    }
+
+    //console.log(allTemperatures.length) //length is 120, thats good because 24 hrs * 5 days
 
 
-
-    //load the JSON into a local file
-
-    //call the python script to execute on the JSON
-
-    //the python script will work on the JSON and predict predictions in another JSON
+    //load the data into a local CSV file
 }
 
 //returns an array of UNIX times for the past 5 days
@@ -40,14 +48,6 @@ function getPastTimes()
     }
 
     return pastTimes;
-}
-
-async function getAPIResponse(url)
-{
-    fetch(url)
-        .then(response => {
-            return response.json()
-        })
 }
 
 //returns an array (really a promise) of [lat, long]
@@ -81,6 +81,27 @@ async function getLatLong(zip)
         })
         .catch(err => { throw err });
     */
+}
+
+async function performOpenWeatherAPICall(url)
+{
+    const response = await fetch(url);
+    const json = await response.json();
+
+    //select the 'hourly' section
+    const hourly = json["hourly"];
+
+    //return an array of only the temperatures from every hour
+    let temperatures = [];
+    for (let i = 0; i < hourly.length; i++)
+    {
+        let currKelvinTemp = hourly[i]["temp"];
+        let currFarenTemp = (9/5) * currKelvinTemp - 459.67;
+
+        temperatures.push(currFarenTemp);
+    }
+
+    return temperatures;
 }
 
 const fetch = require('node-fetch')
