@@ -118,7 +118,7 @@ def make_predictions(filename):
     x_ticks = np.linspace(0, len(series)-1, num=int(len(series)/5))
     plt.xticks(x_ticks, rotation=45)
 
-    y_ticks = np.linspace(50,110,num=30)
+    y_ticks = np.linspace(0,110,num=45)
     plt.yticks(y_ticks)
 
     plt.legend(loc='upper right')
