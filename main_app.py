@@ -1,22 +1,12 @@
-from flask import Flask, render_template, request
-from flask_cors import CORS, cross_origin
-
 import time
 import requests
 import pandas as pd
+import re
 
-app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
-
-@app.route("/")
-def main():
-    app.config['TEMPLATES_AUTO_RELOAD'] = True
-    return render_template("homepage.html")
-
-def loadPastData():
+def loadPastData(zipcode):
     pastTimes = getPastTimes() #past 5 days in UNIX time
 
-    zipcode = "78613" #change to get form input later
+    #zipcode = "78613" #change to get form input later
     lat, lon = getLatLong(zipcode)
     
     weatherApiKey = 'ef49a66f02393c65eb96e511aa8a7898'; #harish's api key
@@ -69,6 +59,19 @@ def performOpenWeatherAPICall(url):
     return temperatures
 
 if __name__ == "__main__":
-    app.run()
-    #pastData = loadPastData()
-    #print(pastData)
+    zipcode = str(input("Welcome to Weather Prediction. Enter a US zip code (5 digits) and a graphic will be generated of the temperature for the next 24 hours.\n"))
+    
+    #load the past data
+    pastData = loadPastData(zipcode)
+
+    #generate a local csv for the notebook to operate on
+    with open('dataupload.csv', 'w') as f:
+        f.write('dt,temp\n')
+
+        for i in range(len(pastData)):
+            f.write(f"{i},{pasData[i]}\n")
+    
+
+    #import notebook.py and do that, generating matplotlib graphics
+    from notebook import make_predictions
+    make_predictions()

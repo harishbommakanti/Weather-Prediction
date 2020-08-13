@@ -94,7 +94,7 @@ def make_predictions():
     predictions = []
 
     #load the dataset
-    series = read_csv('test_dataupload.csv', header=0, index_col=0, squeeze=True)
+    series = read_csv('dataupload.csv', header=0, index_col=0, squeeze=True)
     #print(series.shape)
 
     for i in range(numTimeSteps):
