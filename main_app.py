@@ -52,7 +52,7 @@ def performOpenWeatherAPICall(url):
 
     for i in range(len(hourly_data_arr)):
         kelvin = hourly_data_arr[i]['temp']
-        faren = (9/5) * kelvin - 459.67
+        faren = int((9/5) * kelvin - 459.67)
 
         temperatures.append(faren)
     
@@ -61,6 +61,15 @@ def performOpenWeatherAPICall(url):
 if __name__ == "__main__":
     zipcode = str(input("Welcome to Weather Prediction. Enter a US zip code (5 digits) and a graphic will be generated of the temperature for the next 24 hours.\n"))
     
+    #make sure that zipcode is valid
+    flag = True
+    while flag:
+        try:
+            getLatLong(zipcode)
+            flag = False
+        except:
+            zipcode = str(input("Please make sure you enter a valid US zip code.\n"))
+
     #load the past data
     pastData = loadPastData(zipcode)
 
@@ -69,9 +78,10 @@ if __name__ == "__main__":
         f.write('dt,temp\n')
 
         for i in range(len(pastData)):
-            f.write(f"{i},{pasData[i]}\n")
+            f.write(f"{i},{pastData[i]}\n")
     
-
     #import notebook.py and do that, generating matplotlib graphics
-    from notebook import make_predictions
-    make_predictions()
+    from notebook import make_predictions, inSampleARIMA
+    make_predictions("dataupload.csv")
+
+    exit()

@@ -39,7 +39,7 @@ def AutoRegTrain(series):
     X = difference(series.values)
 
     #fit the model
-    model = AutoReg(X,lags=6)
+    model = AutoReg(X,lags=24)
     model_fit = model.fit()
 
     #save model to file
@@ -85,17 +85,16 @@ def updateDataSet(recentPrediction):
 
 
 
-def make_predictions():
+def make_predictions(filename):
     """Trains the AutoReg model and returns an array of predictions"""
-    #predict the future
-
-    numTimeSteps = 16
-    X_predict = np.linspace(40, 40+numTimeSteps-1, num=numTimeSteps)
-    predictions = []
-
+    
     #load the dataset
-    series = read_csv('dataupload.csv', header=0, index_col=0, squeeze=True)
+    series = read_csv(filename, header=0, index_col=0, squeeze=True)
+    X = series.values
     #print(series.shape)
+
+    numTimeSteps = 48
+    predictions = []
 
     for i in range(numTimeSteps):
         AutoRegTrain(series) #train based on past data and differenced data
@@ -103,13 +102,34 @@ def make_predictions():
         predictions.append(newPrediction) #add new prediction to predictions array
 
         #update series by adding the new prediction to it, treating it as ground truth data
-        series = series.append(pd.Series([newPrediction], index=[40+i]))
+        series = series.append(pd.Series([newPrediction], index=[len(X)+i]))
 
     #plot the data to see how feasible it is, seems very feasible
 
-    #print(series)
-    series.plot()
-    plt.plot(X_predict, predictions, color='red')
+    print("\nA matplotlib graph should have shown up. For the full experience, view it in full screen.\n\nMake sure to close the matplotlib window for the program to terminate.\n")
+
+    X_history = np.linspace(0,len(X),num=len(X))
+    X_predict = np.linspace(len(X), len(X)+numTimeSteps-1, num=numTimeSteps)
+
+    plt.plot(X_history, X, label="Hourly data over the past 5 days", color='blue')
+    plt.plot(X_predict, predictions, label = "Hourly forecast over next 2 days", color='red', marker='o')
+    plt.title(f"Forecast over the next {numTimeSteps} hours (Farenheit) given the past 5 days of data")
+
+    from datetime import datetime
+    now = datetime.now()
+    current_time = now.strftime("%H:%M")
+
+    plt.xlabel(f"Time from 5 days ago at {current_time} (Hours)")
+    plt.ylabel(f"Temperature (Farenheit)")
+    
+    x_ticks = np.linspace(0, len(series)-1, num=int(len(series)/5))
+    plt.xticks(x_ticks, rotation=45)
+
+    y_ticks = np.linspace(50,110,num=30)
+    plt.yticks(y_ticks)
+
+    plt.legend(loc='upper right')
+
     plt.show()
 
 
@@ -132,7 +152,7 @@ def make_predictions():
 #other methods that didn't work out as well as I would've thought
 
 def inSampleARIMA():
-    df = pd.read_csv('test_dataupload.csv', header=0, index_col=0, squeeze=True)
+    df = pd.read_csv('dataupload.csv', header=0, index_col=0, squeeze=True)
     #print(df)
     #df.plot()
     #autocorrelation_plot(df)
@@ -153,9 +173,9 @@ def inSampleARIMA():
     #plot residual errors
     residuals = DataFrame(model_fit.resid)
     #residuals.plot() #shows trend info not captured by model
-    plt.show()
+    #plt.show()
     #residuals.plot(kind='kde') #errors are guassian, may not be centered on zero
-    plt.show()
+    #plt.show()
     #print(residuals.describe)
     #--------------------------------------------------------------
 
@@ -167,8 +187,8 @@ def inSampleARIMA():
     #train, test = X[0:size], X[size:]
     history = [i for i in X] #[x for x in train]
 
-    num_pred = 20
-    X_predict = [40+i for i in range(num_pred)]
+    num_pred = 48
+    X_predict = [len(X)+i for i in range(num_pred)]
     predictions = list()
 
     for i in range(num_pred):
