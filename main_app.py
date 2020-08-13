@@ -1,8 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_cors import CORS, cross_origin
 
 import time
 import requests
+import pandas as pd
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/api/*": {"origins": "*"}})

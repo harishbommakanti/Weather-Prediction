@@ -115,7 +115,7 @@ def make_predictions():
 
     return predictions
 
-make_predictions()
+#make_predictions()
 
 
 
