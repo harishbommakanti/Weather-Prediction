@@ -16,10 +16,10 @@ python3 main_app.py
 ```
 
 ## Program Detail
-- Asks user for a certain zipcode
+- Asks user for a certain zipcode. Some zipcodes aren't available due to the API like 41376.
 - Perform API calls in the background to gather the data and compile it into a local file.
     - First API call is to convert zipcode into latitude/longitude using [https://www.zipcodeapi.com](https://www.zipcodeapi.com). Latitude/longitude is needed for gathering weather data using our chosen weather data API.
-    - Gathers the last 5 days worth of weather data from the entered zipcode using [https://openweathermap.org](https://openweathermap.org)in hourly intervals.
+    - Gathers the last 5 days worth of weather data from the entered zipcode using [https://openweathermap.org](https://openweathermap.org) in hourly intervals.
 - Uses the `AutoReg` model from `statsmodels.tsa` to make weather predictions for the next 48 hours.
     - Model initially is trained over true, observed data (hourly data over past 5 days).
     - Since `AutoReg` predicts the next timestep in the future, for each timestep in the next 48 hours, the model would predict a new temperature.
