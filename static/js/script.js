@@ -1,5 +1,4 @@
 //const fetch = require('node-fetch');
-
 async function main()
 {
     //get past 5 times at intervals currTime-24hr, currTime-28hr etc.
@@ -7,11 +6,11 @@ async function main()
 
 
     //user zipcode -> lat-long
-    let zipcodeInput = "78613";//document.getElementById("zipcode").value().trim().substring(0,5);
+    let zipcodeInput = document.getElementById("zipcode").value.trim().substring(0,5);
     let latLongArr = await getLatLong(zipcodeInput);
     let lat = latLongArr[0];
     let long = latLongArr[1];
-    //console.log(latLongArr);
+    console.log(latLongArr);
 
 
 
@@ -62,15 +61,16 @@ async function getLatLong(zip)
     if (!(zip.length == 5 && /^[0-9]+$/.test(zip)))
     {
         alert("Zipcode is not formatted correctly. Make sure it only has 5 digits and matches US Zipcode format.")
+        return;
     }
 
     let applicationApiKey = 'hKzocZfFBzwpJU0NImyynukV7g7RnN3aH8tX2WWc6woz2VJy8ecyYJCr1aQtb0FJ'
-    //let jsClientKey = 'js-eV2aEpVYlSwidSXUswp6Hvo94QGoBervP9GDDJAG3xowo6hLvrfLzecizuvcsUxs'
+    let jsClientKey = 'js-eV2aEpVYlSwidSXUswp6Hvo94QGoBervP9GDDJAG3xowo6hLvrfLzecizuvcsUxs'
 
     let url = `https://www.zipcodeapi.com/rest/${applicationApiKey}/info.json/${zip}/degrees`
 
     
-    const response = await fetch(url);
+    const response = await window.fetch('https://cors-anywhere.herokuapp.com/' + url);
     const json = await response.json();
 
     const arr = [json["lat"], json["lng"]];
@@ -89,8 +89,8 @@ async function getLatLong(zip)
 
 async function performOpenWeatherAPICall(url)
 {
-    const response = await fetch(url);
-    const json = await response.json();
+    const response = await window.fetch('https://cors-anywhere.herokuapp.com/' + url);
+    const json   = await response.json();
 
     //select the 'hourly' section
     const hourly = json["hourly"];
