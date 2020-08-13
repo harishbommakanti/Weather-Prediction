@@ -59,7 +59,7 @@ def performOpenWeatherAPICall(url):
     return temperatures
 
 if __name__ == "__main__":
-    zipcode = str(input("Welcome to Weather Prediction. Enter a US zip code (5 digits) and a graphic will be generated of the temperature for the next 24 hours.\n"))
+    zipcode = str(input("Welcome to Weather Prediction. Enter a US zip code (5 digits) and a graphic will be generated of the temperature forecast for the next 24 hours.\n"))
     
     #make sure that zipcode is valid
     flag = True
@@ -81,7 +81,7 @@ if __name__ == "__main__":
             f.write(f"{i},{pastData[i]}\n")
     
     #import notebook.py and do that, generating matplotlib graphics
-    from notebook import make_predictions, inSampleARIMA
+    from notebook import make_predictions
     make_predictions("dataupload.csv")
 
     exit()
