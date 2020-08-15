@@ -1,5 +1,7 @@
 # Weather-Prediction
-A program to predict weather given data from the past 5 days. Uses time series modeling to produce a multi-step forecast for 48 hours past the current time.
+- A program to predict weather given data from the past 5 days.
+- Uses time series modeling to produce a multi-step forecast for 48 hours past the current time
+- Also plots the forecast by OpenWeather's API which should be more informed and correct.
 
 ![Program Screenshot](images/Weather-Prediction-sc.png)
 
@@ -9,11 +11,15 @@ Recommended usage is through Anaconda, this will allow the user to import the gi
 - Matplotlib
 - Numpy, Pandas, statsmodels
 
+- The only 3 components needed for the software are `main_app.py`, `notebook.py`, and a `models` folder.
+- The two python files must be on the same directory, and the `models` folder must be at the same directory as the other two files. The `models` folder may be empty or filled with previous data.
+
 ## Usage
 Run the program with the following code:
 ```python
 python3 main_app.py
 ```
+While the program runs, the `models` folder will be periodically updated and there will be a `dataupload.csv` file that will be generated.
 
 ## Program Detail
 - Asks user for a certain zipcode. Some zipcodes aren't available due to the API like 41376.
@@ -24,4 +30,5 @@ python3 main_app.py
     - Model initially is trained over true, observed data (hourly data over past 5 days).
     - Since `AutoReg` predicts the next timestep in the future, for each timestep in the next 48 hours, the model would predict a new temperature.
     - Then, the model would treat each new temperature as ground truth data, which allows multi-step forecasting over the next 48 hours.
+- Also draws another graph of the OpenWeather forecast over the next 48 hours which should definitely be more informed than my user created model.
 - Produces a styled matplotlib graph of the results.

@@ -3,18 +3,16 @@ import requests
 import pandas as pd
 import re
 
-def loadPastData(zipcode):
-    pastTimes = getPastTimes() #past 5 days in UNIX time
+#for openweathermap
+weather_api_key = 'ef49a66f02393c65eb96e511aa8a7898' #harish's api key
 
-    #zipcode = "78613" #change to get form input later
-    lat, lon = getLatLong(zipcode)
-    
-    weatherApiKey = 'ef49a66f02393c65eb96e511aa8a7898'; #harish's api key
+def loadPastData(lat, lon):
+    pastTimes = getPastTimes() #past 5 days in UNIX time
 
     all_data = []
     for i in range(len(pastTimes)):
         time = pastTimes[i]
-        url = f'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lon}&dt={time}&appid={weatherApiKey}'
+        url = f'https://api.openweathermap.org/data/2.5/onecall/timemachine?lat={lat}&lon={lon}&dt={time}&appid={weather_api_key}'
 
         daily_temps = performOpenWeatherAPICall(url)
         all_data.extend(daily_temps)
@@ -37,6 +35,7 @@ def getPastTimes():
 
 def getLatLong(zip):
     applicationApiKey = 'hKzocZfFBzwpJU0NImyynukV7g7RnN3aH8tX2WWc6woz2VJy8ecyYJCr1aQtb0FJ'
+
     url = f"https://www.zipcodeapi.com/rest/{applicationApiKey}/info.json/{zip}/degrees"
 
     response = requests.get(url).json()
@@ -52,26 +51,47 @@ def performOpenWeatherAPICall(url):
 
     for i in range(len(hourly_data_arr)):
         kelvin = hourly_data_arr[i]['temp']
-        faren = int((9/5) * kelvin - 459.67)
-
-        temperatures.append(faren)
+        temperatures.append(to_faren(kelvin))
     
     return temperatures
 
+def to_faren(kelvin):
+    """Converts from kelvin to farenheit"""
+    return int((9/5) * kelvin - 459.67)
+
+def get_future_forecast(lat, lon):
+    url = f'https://api.openweathermap.org/data/2.5/onecall?lat={lat}&lon={lon}&appid={weather_api_key}'
+
+    response = requests.get(url).json()
+
+    hourly_data = response['hourly']
+
+    correct_forecast = []
+
+    for i in range(len(hourly_data)):
+        kelvin = hourly_data[i]['temp']
+        correct_forecast.append(to_faren(kelvin))
+    
+    return correct_forecast
+
+
 if __name__ == "__main__":
-    zipcode = str(input("Welcome to Weather Prediction. Enter a US zip code (5 digits) and a graphic will be generated of the temperature forecast for the next 24 hours.\n"))
+    zipcode = str(input("Welcome to Weather Prediction. Enter a US zip code (5 digits) and a graphic will be generated of the program generated temperature forecast as well as the forecast done by OpenWeather's API for the next 48 hours.\n"))
     
     #make sure that zipcode is valid
+    test_coords = 30.5052, -97.82
+    lat, lon = test_coords
+    
     flag = True
     while flag:
         try:
-            getLatLong(zipcode)
+            lat, lon = getLatLong(zipcode)
             flag = False
         except:
-            zipcode = str(input("Please make sure you enter a valid US zip code.\n"))
-
+            zipcode = str(input("Please make sure you enter a valid US zip code. Keep in mind that some zip codes like 41376 are not available for the forecast due to the APIs.\n"))
+    
     #load the past data
-    pastData = loadPastData(zipcode)
+    pastData = loadPastData(lat, lon)
 
     #generate a local csv for the notebook to operate on
     with open('dataupload.csv', 'w') as f:
@@ -80,8 +100,9 @@ if __name__ == "__main__":
         for i in range(len(pastData)):
             f.write(f"{i},{pastData[i]}\n")
     
-    #import notebook.py and do that, generating matplotlib graphics
-    from notebook import make_predictions
-    make_predictions("dataupload.csv")
+    #record openweather predictions
+    openweather_preds = get_future_forecast(lat, lon)
 
-    exit()
+    #import notebook.py and do that, generating matplotlib graphics
+    from notebook import make_plot_predictions
+    make_plot_predictions("dataupload.csv", openweather_preds)

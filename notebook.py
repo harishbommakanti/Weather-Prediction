@@ -78,7 +78,7 @@ def updateDataSet(recentPrediction):
 
 
 
-def make_predictions(filename):
+def make_plot_predictions(filename, openweather_preds):
     """Trains the AutoReg model and returns an array of predictions"""
     
     #load the dataset
@@ -105,23 +105,22 @@ def make_predictions(filename):
     X_predict = np.linspace(len(X), len(X)+numTimeSteps-1, num=numTimeSteps)
 
     plt.plot(X_history, X, label="Hourly data over the past 5 days", color='blue')
-    plt.plot(X_predict, predictions, label = "Hourly forecast over next 2 days", color='red', marker='o')
-    plt.title(f"Forecast over the next {numTimeSteps} hours (Farenheit) given the past 5 days of data")
+    plt.plot(X_predict, predictions, label = "Model generated forecast over next 48 Hours", color='red')
+    plt.plot(X_predict, openweather_preds, label= "OpenWeather forecast over next 48 Hours", color='green')
+    plt.title(f"Forecasts over the next {numTimeSteps} hours (Farenheit) from 12:00 AM today given the past 5 days of data")
 
-    from datetime import datetime
-    now = datetime.now()
-    current_time = now.strftime("%H:%M")
-
-    plt.xlabel(f"Time from 5 days ago at {current_time} (Hours)")
+    plt.xlabel(f"Time from 5 days ago at 12:00 AM (Hours)")
     plt.ylabel(f"Temperature (Farenheit)")
     
-    x_ticks = np.linspace(0, len(series)-1, num=int(len(series)/5))
+    x_ticks = np.linspace(0, 167, num=int(170/5)) #24*7 = 168, so thats the max itll ever go, divide by 2 to get non messy graph
     plt.xticks(x_ticks, rotation=45)
 
-    y_ticks = np.linspace(0,110,num=45)
+    y_ticks = np.linspace(0,110,num=int(110/5))
     plt.yticks(y_ticks)
 
-    plt.legend(loc='upper right')
+    plt.legend(loc='lower right')
+
+    plt.grid() #set the grid
 
     plt.show()
 
